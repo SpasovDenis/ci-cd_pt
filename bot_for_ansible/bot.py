@@ -197,7 +197,7 @@ def getpsCommand(update: Update, context):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
-    stdin, stdout, stderr = client.exec_command('ps -A u | head -n 10')
+    stdin, stdout, stderr = client.exec_command('ps -A u | head -n 20')
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
@@ -213,7 +213,7 @@ def getssCommand(update: Update, context):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
-    stdin, stdout, stderr = client.exec_command('ss | head -n 10')
+    stdin, stdout, stderr = client.exec_command('ss | head -n 20')
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
@@ -312,7 +312,7 @@ def getreglogCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 
