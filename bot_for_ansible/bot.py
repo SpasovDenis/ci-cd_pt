@@ -61,7 +61,7 @@ def getrealeseCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('cat /etc/os-release')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getunameCommand(update: Update, context):
@@ -76,7 +76,7 @@ def getunameCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('hostnamectl')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getuptimeCommand(update: Update, context):
@@ -91,7 +91,7 @@ def getuptimeCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('uptime')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getdfCommand(update: Update, context):
@@ -107,7 +107,7 @@ def getdfCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getfreeCommand(update: Update, context):
@@ -122,7 +122,7 @@ def getfreeCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('free')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getmpstatCommand(update: Update, context):
@@ -137,7 +137,7 @@ def getmpstatCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('mpstat')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getwCommand(update: Update, context):
@@ -153,7 +153,7 @@ def getwCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getauthsCommand(update: Update, context):
@@ -169,7 +169,7 @@ def getauthsCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getcritCommand(update: Update, context):
@@ -185,7 +185,7 @@ def getcritCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getpsCommand(update: Update, context):
@@ -201,7 +201,7 @@ def getpsCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getssCommand(update: Update, context):
@@ -217,7 +217,7 @@ def getssCommand(update: Update, context):
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
-    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(decoded_data)
 
 def getservicesCommand(update: Update, context):
@@ -232,7 +232,7 @@ def getservicesCommand(update: Update, context):
     stdin, stdout, stderr = client.exec_command('systemctl --type=service --state=running')
     data = stdout.read() + stderr.read()
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    data = str(data).replace('\\n', '\n').replace('\\t', '\t')
     update.message.reply_text(data)
 
 def getemailCommand(update: Update, context):
