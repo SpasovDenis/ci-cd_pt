@@ -105,9 +105,10 @@ def getdfCommand(update: Update, context):
     client.connect(hostname=host, username=username, password=password, port=port)
     stdin, stdout, stderr = client.exec_command('df -a')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getfreeCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -150,9 +151,10 @@ def getwCommand(update: Update, context):
     client.connect(hostname=host, username=username, password=password, port=port)
     stdin, stdout, stderr = client.exec_command('w')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getauthsCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -163,11 +165,12 @@ def getauthsCommand(update: Update, context):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
-    stdin, stdout, stderr = client.exec_command('last')
+    stdin, stdout, stderr = client.exec_command('last -10')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getcritCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -180,9 +183,10 @@ def getcritCommand(update: Update, context):
     client.connect(hostname=host, username=username, password=password, port=port)
     stdin, stdout, stderr = client.exec_command('journalctl -p crit -n 5')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getpsCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -195,9 +199,10 @@ def getpsCommand(update: Update, context):
     client.connect(hostname=host, username=username, password=password, port=port)
     stdin, stdout, stderr = client.exec_command('ps -A u | head -n 10')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getssCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -210,9 +215,10 @@ def getssCommand(update: Update, context):
     client.connect(hostname=host, username=username, password=password, port=port)
     stdin, stdout, stderr = client.exec_command('ss | head -n 10')
     data = stdout.read() + stderr.read()
+    decoded_data = data.decode('utf-8')
     client.close()
-    data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-    update.message.reply_text(data)
+    decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+    update.message.reply_text(decoded_data)
 
 def getservicesCommand(update: Update, context):
     host = os.getenv('RM_HOST')
@@ -440,16 +446,18 @@ def get_apt_list(update: Update, context):
     checkall = bool(aptRegex.match(user_input))
     if checkall is True:
         stdins, stdouts, stderrs = client.exec_command('dpkg-query -l | head -n 10')
-        data = stdouts.read() + stderrs.read()
+        data = stdout.read() + stderr.read()
+        decoded_data = data.decode('utf-8')
         client.close()
-        data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-        update.message.reply_text(data)
+        decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+        update.message.reply_text(decoded_data)
     else:
         stdin, stdout, stderr = client.exec_command('dpkg-query -s '+ user_input)
         data = stdout.read() + stderr.read()
+        decoded_data = data.decode('utf-8')
         client.close()
-        data = str(data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
-        update.message.reply_text(data)
+        decoded_data = str(decoded_data).replace('\\n', '\n').replace('\\t', '\t')[2:-1]
+        update.message.reply_text(decoded_data)
 
     return ConversationHandler.END  # Завершаем работу обработчика диалога
 
