@@ -349,7 +349,7 @@ def save_phone_numbers(update: Update, context: CallbackContext) -> int:
                                                 database=os.getenv('DB_DATABASE'))
                 cursor = connection.cursor()
                 for phone_number in phone_numbers:
-                    cursor.execute("INSERT INTO phone_numbers (Номер_телефона) VALUES (%s);", (phone_number,))
+                    cursor.execute("INSERT INTO phone_numbers (numbers) VALUES (%s);", (phone_number,))
                 connection.commit()
                 update.message.reply_text('Номера телефонов успешно сохранены в базу данных.')
             except Exception as e:
@@ -397,7 +397,7 @@ def save_emails(update: Update, context: CallbackContext) -> int:
                                                 database=os.getenv('DB_DATABASE'))
                 cursor = connection.cursor()
                 for email in emailList:
-                    cursor.execute("INSERT INTO emails (Электроннаяпочта) VALUES (%s);", (email,))
+                    cursor.execute("INSERT INTO emails (mails) VALUES (%s);", (email,))
                 connection.commit()
                 update.message.reply_text('Email-адреса успешно сохранены в базу данных.')
             except Exception as e:
