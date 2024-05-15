@@ -445,7 +445,7 @@ def get_apt_list(update: Update, context):
 
     checkall = bool(aptRegex.match(user_input))
     if checkall is True:
-        stdins, stdouts, stderrs = client.exec_command('dpkg-query -l | head -n 10')
+        stdins, stdout, stderr = client.exec_command('dpkg-query -l | head -n 10')
         data = stdout.read() + stderr.read()
         decoded_data = data.decode('utf-8')
         client.close()
