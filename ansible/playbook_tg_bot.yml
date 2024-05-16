@@ -1,0 +1,308 @@
+- hosts: database_server
+  become: yes
+  tasks:
+    - name: Установка Pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Установка psycopg2 с помощью apt
+      apt:
+        name: python3-psycopg2
+        state: present
+        update_cache: yes
+
+
+    - name: Установка PostgreSQL 15
+      ansible.builtin.apt:
+        name: postgresql-15
+        state: present
+
+    - name: Запуск сервиса PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+
+    - name: Настройка файла postgresql.conf
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        line: |
+          listen_addresses = '*'
+        state: present
+      notify: restart postgresql
+
+
+    - name: Перезапуск службы PostgreSQL для применения изменений
+      service:
+        name: postgresql
+        state: restarted
+
+    - name: Изменение метода аутентификации для пользователя postgres и настройка файла pg_hba.conf
+      block:
+        - lineinfile:
+            path: /etc/postgresql/15/main/pg_hba.conf
+            regexp: '^local\s+all\s+postgres\s+peer$'
+            line: 'local all postgres trust'
+            state: present
+
+        - lineinfile:
+            path: /etc/postgresql/15/main/pg_hba.conf
+            line: 'host all all 127.0.0.1/32 trust'
+            state: present
+      notify: restart postgresql
+
+    - name: Перезапуск службы PostgreSQL для применения изменений
+      service:
+        name: postgresql
+        state: restarted
+
+
+    # Использование модуля postgresql_user для изменения пароля
+    - name: Изменение пароля пользователя postgres
+      postgresql_user:
+        name: postgres
+        password: "{{ postgres_password }}"
+    
+    - name: Восстановление метода аутентификации для пользователя postgres на 'md5'
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        regexp: 'local all postgres trust'
+        line: 'local all postgres md5'
+      notify: restart postgresql
+
+
+    - name: Восстановление метода аутентификации 
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        line: 'host    {{ db_name }}    {{ postgres_user }}    {{ bot_ip_server }}/24    md5'
+      notify: restart postgresql
+
+    - name: Создание базы данных
+      postgresql_db:
+        name: "{{ db_name }}"
+        login_user: "{{ postgres_user }}"
+        login_password: "{{ postgres_password }}"
+
+
+    - name: Создание таблиц
+      ansible.builtin.postgresql_query:
+        login_user: "{{ postgres_user }}"
+        login_password: "{{ postgres_password }}"
+        db: "{{ db_name }}"
+        query: |
+          CREATE TABLE IF NOT EXISTS emails (id SERIAL PRIMARY KEY, mails VARCHAR(255) NOT NULL);
+          CREATE TABLE IF NOT EXISTS phone_numbers (id SERIAL PRIMARY KEY, numbers VARCHAR(255) NOT NULL);
+          INSERT INTO emails (mails) VALUES ('sova.23@mail.ru');
+          INSERT INTO phone_numbers (numbers) VALUES ('89354632899');
+
+    - name: Создание директории для архива
+      ansible.builtin.file:
+        path: /oracle/pg_data/archive/
+        state: directory
+        owner: "{{ postgres_user }}"
+        group: "{{ ansible_password }}"
+        mode: '0755'
+
+    - name: Установка прав на директорию для пользователя postgres
+      ansible.builtin.file:
+        path: /oracle/pg_data/archive/
+        owner: "{{ postgres_user }}"
+        group: "{{ postgres_user }}"
+        mode: '0755'
+        state: directory
+
+    - name: Настройка файла postgresql.conf
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        line: |
+          archive_mode = on
+          archive_command = 'cp %p /oracle/pg_data/archive/%f'
+          max_wal_senders = 10
+          wal_level = replica
+          wal_log_hints = on
+        state: present
+      notify: restart postgresql
+
+    - name: Перезапуск службы PostgreSQL для применения изменений
+      service:
+        name: postgresql
+        state: restarted
+
+    - name: Настройка файла pg_hba.conf
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        line: 'host replication {{ postgres_user }} {{ ip_replica_server }}/24 scram-sha-256'
+        state: present
+
+    - name: Перезапуск службы PostgreSQL для применения изменений
+      service:
+        name: postgresql
+        state: restarted
+
+  handlers:
+    - name: restart postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+- hosts: replica_server
+  become: yes
+  tasks:
+    - name: Установка Pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Установка psycopg2 с помощью apt
+      apt:
+        name: python3-psycopg2
+        state: present
+        update_cache: yes
+
+    - name: Установка pexpect с помощью apt
+      apt:
+        name: python3-pexpect
+        state: present
+        update_cache: yes
+
+    - name: Установка PostgreSQL 15
+      ansible.builtin.apt:
+        name: postgresql-15
+        state: present
+
+    - name: Установка PostgreSQL 15
+      ansible.builtin.apt:
+        name: postgresql-contrib
+        state: present
+
+    - name: Изменение метода аутентификации для пользователя postgres и настройка файла pg_hba.conf
+      block:
+        - lineinfile:
+            path: /etc/postgresql/15/main/pg_hba.conf
+            regexp: '^local\s+all\s+postgres\s+peer$'
+            line: 'local all postgres trust'
+            state: present
+
+        - lineinfile:
+            path: /etc/postgresql/15/main/pg_hba.conf
+            line: 'host all all 127.0.0.1/32 trust'
+            state: present
+      notify: restart postgresql
+
+    - name: Перезапуск службы PostgreSQL для применения изменений
+      service:
+        name: postgresql
+        state: restarted
+
+    # Использование модуля postgresql_user для изменения пароля
+    - name: Изменение пароля пользователя postgres
+      postgresql_user:
+        name: postgres
+        password: "{{ replica_password }}"
+    
+    - name: Восстановление метода аутентификации для пользователя postgres на 'md5'
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        regexp: 'local all postgres trust'
+        line: 'local all postgres md5'
+      notify: restart postgresql
+
+
+    - name: Настройка файла postgresql.conf
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        line: |
+          listen_addresses = 'localhost,  {{ ip_master_server }}'
+        state: present
+      notify: restart postgresql
+
+    - name: Остановка сервиса PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+
+    - name: Добавление пользователя postgres в файл sudoers
+      become: yes
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^postgres ALL='
+        line: 'postgres ALL=(ALL:ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+
+    - name: Удаление содержимого каталога PostgreSQL
+      ansible.builtin.command:
+        cmd: sudo -u {{ replica_user }} rm -rf /var/lib/postgresql/15/main/
+      become: yes
+      become_user: postgres
+
+    - name: Выполнение pg_basebackup для создания реплики PostgreSQL
+      ansible.builtin.command:
+        cmd: sudo -u {{ replica_user }} PGPASSWORD='{{ replica_password }}' pg_basebackup -R -h {{ ip_master_server }} -U {{ replica_user }} -D /var/lib/postgresql/15/main -P
+      become: yes
+      become_user: postgres
+
+    - name: Запуск сервиса PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+
+  handlers:
+    - name: restart postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+
+- name: Автоматизация развертывания Python приложения
+  hosts: bot_server
+  become: yes  # Это необходимо для выполнения задач, требующих привилегий sudo
+  tasks:
+    - name: Установка Git
+      apt:
+        name: git
+        state: present
+
+    - name: Установка Pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Установка libpq-dev
+      become: yes
+      apt:
+        name: libpq-dev
+        state: present
+        update_cache: yes
+
+    - name: Установка python3-venv
+      apt:
+        name: python3-venv
+        update_cache: yes
+
+    - name: Создание виртуальной среды Python
+      command :  which python3
+
+    - name: Создание виртуальной среды Python
+      command :  python3 -m venv /home/{{ ansible_user }}/venv
+
+    - name: Клонирование репозитория с GitHub
+      git:
+        repo: 'https://github.com/SpasovDenis/ci-cd_pt.git'
+        dest: /home/ansible/bot
+        clone: yes
+
+    - name: Установка зависимостей из файла requirements.txt
+      pip:
+        requirements: /home/{{ ansible_user }}/bot/bot_for_ansible/requirements.txt
+        virtualenv: /home/ansible/venv
+        virtualenv_command: python3 -m venv
+
+    - name: Установка прав на директорию для пользователя ansible
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/bot/bot_for_ansible/
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '777'
+        state: directory
