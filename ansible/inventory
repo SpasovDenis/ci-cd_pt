@@ -1,0 +1,16 @@
+[database_server]
+db_master ansible_host=192.168.1.3 ansible_user=ansible ansible_password=ansible
+[database_server:vars]
+db_name='telebotdb'
+postgres_user='postgres' #является реплецируемым пользователем
+postgres_password='kali'
+ip_replica_server='192.168.1.5' #указать ip сервера репликации(slave)
+bot_ip_server='192.168.1.4'
+[replica_server]
+db_replica ansible_host=192.168.1.5 ansible_user=ansible ansible_password=ansible
+[replica_server:vars]
+replica_user='postgres' #является реплецируемым пользователем
+replica_password='kali'
+ip_master_server='192.168.1.3' #указать ip сервера master
+[bot_server]
+telegram_bot ansible_host=192.168.1.4 ansible_user=ansible ansible_password=ansible
