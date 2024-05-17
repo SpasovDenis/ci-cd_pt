@@ -308,7 +308,7 @@ def getreglogCommand(update: Update, context):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
-    stdin, stdout, stderr = client.exec_command("sudo cat /var/log/postgresql/postgresql-15-main.log | grep 'replica' | tail -n 10")
+    stdin, stdout, stderr = client.exec_command("sudo cat /var/log/postgresql/postgresql-15-main.log | grep 'REPLICATION' | tail -n 10")
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
