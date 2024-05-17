@@ -291,13 +291,13 @@
     - name: Клонирование репозитория с GitHub
       git:
         repo: 'https://github.com/SpasovDenis/ci-cd_pt.git'
-        dest: /home/ansible/bot
+        dest: /home/{{ ansible_user }}/bot
         clone: yes
 
     - name: Установка зависимостей из файла requirements.txt
       pip:
         requirements: /home/{{ ansible_user }}/bot/bot_for_ansible/requirements.txt
-        virtualenv: /home/ansible/venv
+        virtualenv: /home/{{ ansible_user }}/venv
         virtualenv_command: python3 -m venv
 
     - name: Установка прав на директорию для пользователя ansible
