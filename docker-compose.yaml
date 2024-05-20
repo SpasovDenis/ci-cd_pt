@@ -16,7 +16,7 @@ services:
 
   db:
     image: db_image
-    container-name: db
+    container_name: db
     build:
       context: ./db
       dockerfile: Dockerfile
