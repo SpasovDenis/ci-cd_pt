@@ -303,7 +303,7 @@ def getreglogCommand(update: Update, context):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=host, username=username, password=password, port=port)
-    stdin, stdout, stderr = client.exec_command("docker exec -i devops_bot_db_1 cat /log/postgresql.log | grep 'replic' ")
+    stdin, stdout, stderr = client.exec_command("docker exec -i db cat /log/postgresql.log | grep 'replic' ")
     data = stdout.read() + stderr.read()
     decoded_data = data.decode('utf-8')
     client.close()
